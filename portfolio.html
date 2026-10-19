@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work — Hossam El Bendadi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(5, 5, 8, 0.96);
+      backdrop-filter: blur(16px);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .lightbox.open { display: flex; }
+
+    .lb-top {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 32px;
+      z-index: 1001;
+      background: linear-gradient(to bottom, rgba(5,5,8,0.9), transparent);
+    }
+
+    .lb-info { display: flex; flex-direction: column; gap: 3px; }
+    .lb-cat { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
+    .lb-title { font-family: var(--font-head); font-size: 20px; color: var(--text); }
+
+    .lb-counter {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 2px;
+    }
+
+    .lb-close {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .lb-close:hover { border-color: var(--gold); background: rgba(181,123,238,0.1); }
+
+    .lb-img-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100vh;
+      padding: 80px 100px;
+    }
+
+    .lb-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border: 1px solid var(--gold-border);
+      transition: transform 0.3s ease;
+      cursor: zoom-in;
+      user-select: none;
+    }
+    .lb-img.zoomed {
+      cursor: zoom-out;
+      transform: scale(1.8);
+    }
+
+    .lb-btn {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(10,10,12,0.7);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, background 0.2s;
+      z-index: 1001;
+    }
+    .lb-btn:hover { border-color: var(--gold); background: rgba(181,123,238,0.15); }
+    .lb-prev { left: 24px; }
+    .lb-next { right: 24px; }
+
+    .lb-dots {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 1001;
+      max-width: 80vw;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .lb-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .lb-dot.active { background: var(--gold); transform: scale(1.4); }
+
+    .lb-hint {
+      position: fixed;
+      bottom: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0.6;
+      z-index: 1001;
+      pointer-events: none;
+    }
+
+    .port-item { cursor: pointer; position: relative; overflow: hidden; }
+    .print-only { display: none; }
+    .video-only { display: none; }
+
+    .port-item .port-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #000;
+    }
+
+    .lb-video {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      border: 1px solid var(--gold-border);
+      background: #000;
+      display: none;
+    }
+
+    .port-item .port-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .port-gallery-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(10,10,12,0.85);
+      border: 1px solid var(--gold-border);
+      color: var(--gold);
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      border-radius: 20px;
+      z-index: 2;
+    }
+
+    .port-item .no-img {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); opacity: 0.3;
+    }
+
+    @media (hover: hover) {
+      .lb-hint { display: block; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <img src="logo hossam white.png" alt="HB" style="height:30px;width:auto; object-fit: contain; filter:brightness(0) invert(1);">
+      <span style="display: block; margin-top: 8px;">HOSSAM EL BENDADI</span>
+  </a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="portfolio.html" class="active">Work</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a href="contact.html" class="nav-cta">Hire Me</a>
+</nav>
+
+<div class="page">
+  <section class="portfolio-hero">
+    <span class="section-tag">My Portfolio</span>
+    <h1 class="section-title">Selected <em>Work</em></h1>
+    <p style="color:var(--muted);max-width:460px;margin:20px auto 0;font-size:16px;line-height:1.8;">
+      A curated selection of branding, design, and video projects.
+    </p>
+  </section>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="branding">Branding</button>
+    <button class="filter-btn" data-filter="social">Social Media</button>
+    <button class="filter-btn" data-filter="video">Video</button>
+    <button class="filter-btn" data-filter="print">Print</button>
+    <button class="filter-btn" data-filter="ui">UI/UX</button>
+  </div>
+
+  <div class="portfolio-grid">
+
+    <!-- Climiratech Branding -->
+    <div class="port-item"
+         data-cat="branding"
+         data-title="Climiratech"
+         data-category="Brand Identity"
+         data-img="portfolio%20hossam/identity%20visuel/Climiratech/climira%201.png"
+         data-gallery="portfolio%20hossam/identity%20visuel/Climiratech/climira%201.png,portfolio%20hossam/identity%20visuel/Climiratech/climira%202.png,portfolio%20hossam/identity%20visuel/Climiratech/climira%203.png,portfolio%20hossam/identity%20visuel/Climiratech/climira%204.png,portfolio%20hossam/identity%20visuel/Climiratech/climira%205.png,portfolio%20hossam/identity%20visuel/Climiratech/climira%206.png,portfolio%20hossam/identity%20visuel/Climiratech/climira%207.png,portfolio%20hossam/identity%20visuel/Climiratech/climira%208.png,portfolio%20hossam/identity%20visuel/Climiratech/climira%209.png,portfolio%20hossam/identity%20visuel/Climiratech/climira%2010.png,portfolio%20hossam/identity%20visuel/Climiratech/climira%2011.png">
+      <img class="port-thumb" src="portfolio%20hossam/identity%20visuel/Climiratech/climira%201.png" alt="Climiratech">
+      <span class="port-gallery-badge">11 photos</span>
+      <div class="port-overlay">
+        <p class="port-cat">Brand Identity climiratech</p>
+      </div>
+    </div>
+
+    <!-- Profitize agency Branding -->
+    <div class="port-item"
+         data-cat="branding"
+         data-title="Profitize agency"
+         data-category="Brand Identity"
+         data-img="portfolio%20hossam/identity%20visuel/Profitize%20agency/profitize%201.png"
+         data-gallery="portfolio%20hossam/identity%20visuel/Profitize%20agency/profitize%201.png,portfolio%20hossam/identity%20visuel/Profitize%20agency/profitize%202.png,portfolio%20hossam/identity%20visuel/Profitize%20agency/profitize%203.png,portfolio%20hossam/identity%20visuel/Profitize%20agency/profitize%204.png,portfolio%20hossam/identity%20visuel/Profitize%20agency/profitize%205.png,portfolio%20hossam/identity%20visuel/Profitize%20agency/profitize%206.png,portfolio%20hossam/identity%20visuel/Profitize%20agency/profitize%207.png,portfolio%20hossam/identity%20visuel/Profitize%20agency/profitize%208.png,portfolio%20hossam/identity%20visuel/Profitize%20agency/profitize%209.png">
+      <img class="port-thumb" src="portfolio%20hossam/identity%20visuel/Profitize%20agency/profitize%201.png" alt="Profitize agency">
+      <span class="port-gallery-badge">9 photos</span>
+      <div class="port-overlay">
+        <p class="port-cat">Brand Identity profitize agency</p>
+      </div>
+    </div>
+
+    <!-- ===== SOCIAL MEDIA ===== -->
+
+    <!-- Climiratech Social -->
+    <div class="port-item"
+         data-cat="social"
+         data-title="Climiratech"
+         data-category="Social Media"
+         data-img="portfolio%20hossam/social%20media%20post/climiratech%20post/climira-post-1.png"
+         data-gallery="portfolio%20hossam/social%20media%20post/climiratech%20post/climira-post-1.png,portfolio%20hossam/social%20media%20post/climiratech%20post/climira-post-2.png,portfolio%20hossam/social%20media%20post/climiratech%20post/climira-post-3.png">
+      <img class="port-thumb" src="portfolio%20hossam/social%20media%20post/climiratech%20post/climira-post-1.png" alt="Climiratech Social">
+      <span class="port-gallery-badge">3 posts</span>
+      <div class="port-overlay">
+        <p class="port-cat">climiratech</p>
+      </div>
+    </div>
+
+    <!-- Delivery Social -->
+    <div class="port-item"
+         data-cat="social"
+         data-title="Delivery"
+         data-category="Social Media"
+         data-img="portfolio%20hossam/social%20media%20post/delevry%20post/livraison-1.png"
+         data-gallery="portfolio%20hossam/social%20media%20post/delevry%20post/livraison-1.png,portfolio%20hossam/social%20media%20post/delevry%20post/livraison-2.png,portfolio%20hossam/social%20media%20post/delevry%20post/livraison-3.png">
+      <img class="port-thumb" src="portfolio%20hossam/social%20media%20post/delevry%20post/livraison-1.png" alt="Delivery Social">
+      <span class="port-gallery-badge">3 posts</span>
+      <div class="port-overlay">
+        <p class="port-cat">delevery</p>
+      </div>
+    </div>
+
+    <!-- Inklo Social -->
+    <div class="port-item"
+         data-cat="social"
+         data-title="Inklo"
+         data-category="Social Media"
+         data-img="portfolio%20hossam/social%20media%20post/inklo%20post/inklo-1.png"
+         data-gallery="portfolio%20hossam/social%20media%20post/inklo%20post/inklo-1.png,portfolio%20hossam/social%20media%20post/inklo%20post/inklo-2.png,portfolio%20hossam/social%20media%20post/inklo%20post/inklo-3.png,portfolio%20hossam/social%20media%20post/inklo%20post/inklo-4.png,portfolio%20hossam/social%20media%20post/inklo%20post/inklo-5.png">
+      <img class="port-thumb" src="portfolio%20hossam/social%20media%20post/inklo%20post/inklo-1.png" alt="Inklo Social">
+      <span class="port-gallery-badge">5 posts</span>
+      <div class="port-overlay">
+        <p class="port-cat">inklo</p>
+      </div>
+    </div>
+
+    <!-- Profitize Social -->
+    <div class="port-item"
+         data-cat="social"
+         data-title="Profitize"
+         data-category="Social Media"
+         data-img="portfolio%20hossam/social%20media%20post/profitize%20post/PROFITIZE-1.png"
+         data-gallery="portfolio%20hossam/social%20media%20post/profitize%20post/PROFITIZE-1.png,portfolio%20hossam/social%20media%20post/profitize%20post/PROFITIZE-2.png,portfolio%20hossam/social%20media%20post/profitize%20post/PROFITIZE-3.png">
+      <img class="port-thumb" src="portfolio%20hossam/social%20media%20post/profitize%20post/PROFITIZE-1.png" alt="Profitize Social">
+      <span class="port-gallery-badge">3 posts</span>
+      <div class="port-overlay">
+        <p class="port-cat">profitize</p>
+      </div>
+    </div>
+    
+
+    <!-- YouTube Thumbnails -->
+    <div class="port-item"
+         data-cat="social"
+         data-title="YouTube Thumbnails"
+         data-category="Social Media"
+         data-img="portfolio%20hossam/thumbnail%20youtube/th%201.png"
+         data-gallery="portfolio%20hossam/thumbnail%20youtube/th%201.png,portfolio%20hossam/thumbnail%20youtube/th%202.jpg,portfolio%20hossam/thumbnail%20youtube/th%203.png,portfolio%20hossam/thumbnail%20youtube/th%204.png,portfolio%20hossam/thumbnail%20youtube/th%205.png,portfolio%20hossam/thumbnail%20youtube/th%206.png,portfolio%20hossam/thumbnail%20youtube/th%207.png">
+      <img class="port-thumb" src="portfolio%20hossam/thumbnail%20youtube/th%201.png" alt="YouTube Thumbnails">
+      <span class="port-gallery-badge">7 thumbnails</span>
+      <div class="port-overlay">
+        <p class="port-cat">Youtube Thumbnails</p>
+      </div>
+    </div>
+
+    <!-- Sport Posters (moved from Print to Social Media) -->
+    <div class="port-item"
+         data-cat="social"
+         data-title="Sport Posters"
+         data-category="Social Media"
+         data-img="portfolio%20hossam/poster%20sport/7.png"
+         data-gallery="portfolio%20hossam/poster%20sport/7.png,portfolio%20hossam/poster%20sport/bruno-fernandes.png,portfolio%20hossam/poster%20sport/MAROC-1.png,portfolio%20hossam/poster%20sport/maroc-2.png,portfolio%20hossam/poster%20sport/maroc-3.png,portfolio%20hossam/poster%20sport/MATCH-DAT-3-MAROC.png,portfolio%20hossam/poster%20sport/match-day-1-portugal.png,portfolio%20hossam/poster%20sport/MATCH-DAY-2-MAROC.png,portfolio%20hossam/poster%20sport/MATCH-DAY-4-MAROC.png,portfolio%20hossam/poster%20sport/match-day-4.png,portfolio%20hossam/poster%20sport/match-day-5-maroc.png,portfolio%20hossam/poster%20sport/match-day-5.png,portfolio%20hossam/poster%20sport/match-day-6-maroc.png,portfolio%20hossam/poster%20sport/match-day-6.png,portfolio%20hossam/poster%20sport/MATCH-DAY-7-FINAL.png,portfolio%20hossam/poster%20sport/match-day-11.png,portfolio%20hossam/poster%20sport/MATCH-DAY-ARGENTINE.png,portfolio%20hossam/poster%20sport/MATCH-DAY-BARCA.png,portfolio%20hossam/poster%20sport/MATCH-DAY-ESPAGNE-1.png,portfolio%20hossam/poster%20sport/mbappe.png,portfolio%20hossam/poster%20sport/nike-just-do-it.png,portfolio%20hossam/poster%20sport/nike.png,portfolio%20hossam/poster%20sport/palmeerr.png,portfolio%20hossam/poster%20sport/Ronaldo.png,portfolio%20hossam/poster%20sport/tijjani.png,portfolio%20hossam/poster%20sport/tottenham.png,portfolio%20hossam/poster%20sport/UFC.png,portfolio%20hossam/poster%20sport/VALVERDE-HAT-TRICK.png,portfolio%20hossam/poster%20sport/YAMAL1.png">
+      <img class="port-thumb" src="portfolio%20hossam/poster%20sport/7.png" alt="Sport Posters">
+      <span class="port-gallery-badge">29 posters</span>
+      <div class="port-overlay">
+        <p class="port-cat">sport posters · 29 Posters</p>
+      </div>
+    </div>
+
+    <!-- Video Editing (grouped) -->
+    <div class="port-item video-group all-only"
+         data-cat="video-group"
+         data-title="Video Editing"
+         data-category="Video Editing"
+         data-type="video"
+         data-video="portfolio%20hossam/reel%20video%20editing/hossam%20reel%202.mp4"
+         data-gallery-type="video"
+         data-gallery="portfolio%20hossam/reel%20video%20editing/hossam%20reel%202.mp4,portfolio%20hossam/reel%20video%20editing/hossam%20reel.mp4,portfolio%20hossam/reel%20video%20editing/profitize%20reel.mp4">
+      <video class="port-thumb port-video" src="portfolio%20hossam/reel%20video%20editing/hossam%20reel%202.mp4" muted autoplay loop playsinline preload="metadata"></video>
+      <span class="port-gallery-badge">3 videos</span>
+      <div class="port-overlay">
+        <p class="port-cat">Video Editing · 3 Videos</p>
+      </div>
+    </div>
+
+    <!-- Video individual -->
+    <div class="port-item video-only" data-cat="video" data-title="Hossam Reel 2" data-category="Video Editing" data-type="video" data-video="portfolio%20hossam/reel%20video%20editing/hossam%20reel%202.mp4">
+      <video class="port-thumb port-video" src="portfolio%20hossam/reel%20video%20editing/hossam%20reel%202.mp4" muted autoplay loop playsinline preload="metadata"></video>
+      <div class="port-overlay"><p class="port-cat">Video Editing</p></div>
+    </div>
+    <div class="port-item video-only" data-cat="video" data-title="Hossam Reel" data-category="Video Editing" data-type="video" data-video="portfolio%20hossam/reel%20video%20editing/hossam%20reel.mp4">
+      <video class="port-thumb port-video" src="portfolio%20hossam/reel%20video%20editing/hossam%20reel.mp4" muted autoplay loop playsinline preload="metadata"></video>
+      <div class="port-overlay"><p class="port-cat">Video Editing</p></div>
+    </div>
+    <div class="port-item video-only" data-cat="video" data-title="Profitize Reel" data-category="Video Editing" data-type="video" data-video="portfolio%20hossam/reel%20video%20editing/profitize%20reel.mp4">
+      <video class="port-thumb port-video" src="portfolio%20hossam/reel%20video%20editing/profitize%20reel.mp4" muted autoplay loop playsinline preload="metadata"></video>
+      <div class="port-overlay"><p class="port-cat">Video Editing</p></div>
+    </div>
+
+    <!-- Placeholders (empty slots for your next work) -->
+
+    <!-- PRINT: khawya, zid fiha tswirtek mn be3d -->
+    <div class="port-item" data-cat="print" data-img="" data-title="" data-category="Print Design">
+      <div class="no-img">+</div>
+      <div class="port-overlay"><p class="port-cat">Print Design</p></div>
+    </div>
+
+    <div class="port-item" data-cat="ui" data-img="" data-title="" data-category="UI/UX">
+      <div class="no-img">+</div>
+      <div class="port-overlay"><p class="port-cat">UI/UX</p></div>
+    </div>
+    <div class="port-item" data-cat="branding" data-img="" data-title="" data-category="Branding">
+      <div class="no-img">+</div>
+      <div class="port-overlay"><p class="port-cat">Branding</p></div>
+    </div>
+    <div class="port-item" data-cat="branding" data-img="" data-title="" data-category="Brand Identity">
+      <div class="no-img">+</div>
+      <div class="port-overlay"><p class="port-cat">Brand Identity</p></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lb-top">
+    <div class="lb-info">
+      <span class="lb-cat" id="lb-cat"></span>
+      <span class="lb-title" id="lb-title"></span>
+    </div>
+    <span class="lb-counter" id="lb-counter"></span>
+    <button class="lb-close" id="lb-close">✕</button>
+  </div>
+
+  <div class="lb-img-wrap">
+    <img class="lb-img" id="lb-img" src="" alt="">
+    <video class="lb-video" id="lb-video" controls playsinline preload="metadata"></video>
+  </div>
+
+  <button class="lb-btn lb-prev" id="lb-prev">‹</button>
+  <button class="lb-btn lb-next" id="lb-next">›</button>
+
+  <div class="lb-dots" id="lb-dots"></div>
+  <span class="lb-hint">Click image to zoom · Arrow keys to navigate · ESC to close</span>
+</div>
+
+ <footer>
+    <a href="index.html" class="logo">
+      <img src="logo hossam white.png" alt="HB" style="height:30px;width:auto; object-fit: contain; filter:brightness(0) invert(1);">
+      <span style="display: block; margin-top: 8px;">HOSSAM EL BENDADI</span>
+    </a>
+    <p>© 2026 Hossam El Bendadi</p>
+    <div class="socials">
+      <a href="https://www.instagram.com/hossamdesign_1?igsh=N2c5M213bTdkdm1r" target="_blank">Instagram</a>
+      <a href="https://www.linkedin.com/in/hossam-el-bendadi-33090b414?utm_source=share_via&utm_content=profile&utm_medium=medium_android" target="_blank">LinkedIn</a>
+    </div>
+  </footer>
+
+<script>
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const items = document.querySelectorAll('.port-item');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      items.forEach(item => {
+        if (filter === 'all') {
+          item.style.display = (item.classList.contains('print-only') || item.classList.contains('video-only')) ? 'none' : '';
+        } else if (filter === 'print') {
+          item.style.display = item.classList.contains('all-only') ? 'none' :
+            (item.dataset.cat === 'print' ? 'block' : 'none');
+        } else if (filter === 'video') {
+          item.style.display = item.classList.contains('all-only') ? 'none' :
+            (item.dataset.cat === 'video' ? 'block' : 'none');
+        } else {
+          item.style.display = item.dataset.cat === filter ? '' : 'none';
+        }
+      });
+      buildVisible();
+    });
+  });
+
+  const lb        = document.getElementById('lightbox');
+  const lbImg     = document.getElementById('lb-img');
+  const lbCat     = document.getElementById('lb-cat');
+  const lbTitle   = document.getElementById('lb-title');
+  const lbCounter = document.getElementById('lb-counter');
+  const lbDots    = document.getElementById('lb-dots');
+  const lbClose   = document.getElementById('lb-close');
+  const lbPrev    = document.getElementById('lb-prev');
+  const lbNext    = document.getElementById('lb-next');
+  const lbVideo   = document.getElementById('lb-video');
+
+  let visibleItems  = [];
+  let currentIndex  = 0;
+  let zoomed        = false;
+  let galleryMode   = false;
+  let galleryImages = [];
+  let galleryIndex  = 0;
+  let galleryType   = 'image';
+
+  function buildVisible() {
+    visibleItems = Array.from(document.querySelectorAll('.port-item'))
+      .filter(el => el.style.display !== 'none');
+  }
+  buildVisible();
+
+  function openLightbox(index) {
+    currentIndex = index;
+    zoomed = false;
+    lbImg.classList.remove('zoomed');
+
+    const item = visibleItems[currentIndex];
+    const galleryAttr = item.dataset.gallery;
+
+    if (galleryAttr) {
+      galleryMode   = true;
+      galleryImages = galleryAttr.split(',').map(s => s.trim()).filter(Boolean);
+      galleryIndex  = 0;
+      galleryType   = item.dataset.galleryType || item.dataset.type || 'image';
+    } else {
+      galleryMode   = false;
+      galleryImages = [];
+      galleryIndex  = 0;
+      galleryType   = item.dataset.type || 'image';
+    }
+
+    updateLightbox();
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    zoomed = false;
+    lbImg.classList.remove('zoomed');
+    galleryMode = false;
+    lbVideo.pause();
+    lbVideo.removeAttribute('src');
+    lbVideo.load();
+  }
+
+  function updateLightbox() {
+    const item  = visibleItems[currentIndex];
+    const title = item.dataset.title || 'Project';
+    const cat   = item.dataset.category || '';
+
+    lbImg.style.display = 'none';
+    lbVideo.style.display = 'none';
+    lbVideo.pause();
+    lbVideo.removeAttribute('src');
+    lbVideo.load();
+
+    if (galleryMode) {
+      const mediaSrc = galleryImages[galleryIndex];
+
+      if (galleryType === 'video') {
+        lbVideo.src = mediaSrc;
+        lbVideo.style.display = 'block';
+        lbVideo.currentTime = 0;
+        lbVideo.play().catch(() => {});
+      } else {
+        lbImg.src = mediaSrc;
+        lbImg.style.display = 'block';
+      }
+
+      lbCat.textContent     = cat;
+      lbTitle.textContent   = title;
+      lbCounter.textContent = (galleryIndex + 1) + ' / ' + galleryImages.length;
+
+      lbDots.innerHTML = '';
+      galleryImages.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'lb-dot' + (i === galleryIndex ? ' active' : '');
+        dot.addEventListener('click', () => {
+          galleryIndex = i;
+          zoomed = false;
+          lbImg.classList.remove('zoomed');
+          updateLightbox();
+        });
+        lbDots.appendChild(dot);
+      });
+      return;
+    }
+
+    const mediaType = item.dataset.type || 'image';
+
+    if (mediaType === 'video') {
+      const videoSrc = item.dataset.video || '';
+      if (videoSrc) {
+        lbVideo.src = videoSrc;
+        lbVideo.style.display = 'block';
+        lbVideo.currentTime = 0;
+        lbVideo.play().catch(() => {});
+      }
+    } else {
+      const imgSrc = item.dataset.img;
+      if (imgSrc) {
+        lbImg.src = imgSrc;
+        lbImg.style.display = 'block';
+      }
+    }
+
+    lbCat.textContent   = cat;
+    lbTitle.textContent = title;
+    lbCounter.textContent = (currentIndex + 1) + ' / ' + visibleItems.length;
+
+    lbDots.innerHTML = '';
+    visibleItems.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'lb-dot' + (i === currentIndex ? ' active' : '');
+      dot.addEventListener('click', () => { currentIndex = i; zoomed=false; lbImg.classList.remove('zoomed'); openLightbox(i); });
+      lbDots.appendChild(dot);
+    });
+  }
+
+  function goNext() {
+    zoomed = false; lbImg.classList.remove('zoomed');
+    if (galleryMode) {
+      galleryIndex = (galleryIndex + 1) % galleryImages.length;
+    } else {
+      currentIndex = (currentIndex + 1) % visibleItems.length;
+    }
+    updateLightbox();
+  }
+
+  function goPrev() {
+    zoomed = false; lbImg.classList.remove('zoomed');
+    if (galleryMode) {
+      galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
+    } else {
+      currentIndex = (currentIndex - 1 + visibleItems.length) % visibleItems.length;
+    }
+    updateLightbox();
+  }
+
+  document.querySelectorAll('.port-item').forEach((item) => {
+    item.addEventListener('click', () => {
+      buildVisible();
+      const idx = visibleItems.indexOf(item);
+      if (idx !== -1) openLightbox(idx);
+    });
+  });
+
+  lbClose.addEventListener('click', closeLightbox);
+  lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+  lbNext.addEventListener('click', goNext);
+  lbPrev.addEventListener('click', goPrev);
+
+  lbImg.addEventListener('click', e => {
+    e.stopPropagation();
+    zoomed = !zoomed;
+    lbImg.classList.toggle('zoomed', zoomed);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape')      closeLightbox();
+    if (e.key === 'ArrowRight')  goNext();
+    if (e.key === 'ArrowLeft')   goPrev();
+  });
+
+  let touchStartX = 0;
+  lb.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  lb.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) diff > 0 ? goNext() : goPrev();
+  });
+</script>
+
+</body>
+</html>
