@@ -215,9 +215,44 @@
       .hero::before { display: none; }
       .hero-visual { height: 60vw; }
       .projects-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .projects-grid .proj { aspect-ratio: 4 / 3; }
       .proj.tall { grid-row: span 1; }
       .featured-header { flex-direction: column; align-items: flex-start; gap: 20px; }
       .services-teaser-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 767px) {
+      .hero {
+        min-height: auto;
+        gap: 44px;
+        padding: 140px 8% 72px;
+      }
+      .hero h1 { font-size: 52px; letter-spacing: -1px; }
+      .hero-sub { letter-spacing: 3px; }
+      .hero p { margin-bottom: 36px; }
+      .hero-btns { flex-wrap: wrap; }
+      .hero-visual { height: auto; }
+      .hero-frame { width: min(100%, 360px); }
+      .hero-badge { right: 0; bottom: 20px; }
+      .scroll-hint { display: none; }
+      .featured,
+      .services-teaser { padding: 72px 8%; }
+      .featured-header,
+      .services-teaser-header { margin-bottom: 40px; }
+    }
+
+    @media (max-width: 600px) {
+      .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 28px 8%;
+      }
+      .stat { min-width: 0; padding: 20px 8px; }
+      .stat:nth-child(odd) { border-right: 1px solid var(--border); }
+      .stat:nth-child(even) { border-right: 0; }
+      .stat:nth-child(-n + 2) { border-bottom: 1px solid var(--border); }
+      .stat-num { font-size: 38px; }
+      .stat-label { font-size: 10px; letter-spacing: 1.5px; }
     }
   </style>
 </head>
@@ -225,16 +260,19 @@
 
 <nav>
   <a href="index.html" class="logo">
-    <img src="logo hossam white.png" alt="HB" style="height:38px; width:auto; object-fit: contain; filter: brightness(0) invert(1);">
+    <img src="logo hossam white.webp" alt="HB" style="height:38px; width:auto; object-fit: contain; filter: brightness(0) invert(1);">
     <span style="display: block ;margin-top: 8px;">HOSSAM EL BENDADI</span>
   </a>
-  <ul>
+  <ul id="primary-navigation">
     <li><a href="index.html" class="active">Home</a></li>
     <li><a href="about.html">About</a></li>
     <li><a href="services.html">Services</a></li>
     <li><a href="portfolio.html">Work</a></li>
     <li><a href="contact.html">Contact</a></li>
   </ul>
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
   <a href="contact.html" class="nav-cta">Hire Me</a>
 </nav>
 
@@ -313,9 +351,9 @@
 
     <div class="projects-grid">
       <!-- Image : Social Media Post -->
-      <div class="proj tall" data-type="img" data-src="portfolio%20hossam/social%20media%20post/hossam%20post.png" data-title="Social Media Post" data-cat="Social Media">
+      <div class="proj tall" data-type="img" data-src="portfolio%20hossam/social%20media%20post/hossam%20post.webp" data-title="Social Media Post" data-cat="Social Media">
         <div class="proj-img">
-          <img src="portfolio%20hossam/social%20media%20post/hossam%20post.png" alt="Social Media Post">
+          <img src="portfolio%20hossam/social%20media%20post/hossam%20post.webp" alt="Social Media Post">
         </div>
         <div class="proj-overlay">
           <span class="proj-cat">Social Media</span>
@@ -324,9 +362,9 @@
       </div>
 
       <!-- Vidéo 1 : Hossam Reel -->
-      <div class="proj" data-type="video" data-src="portfolio%20hossam/reel%20video%20editing/hossam%20reel.mp4" data-title="Hossam Reel" data-cat="Video Editing">
+      <div class="proj" data-type="video" data-src="portfolio%20hossam/reel%20video%20editing/hossam%20reel%20optimized.mp4" data-title="Hossam Reel" data-cat="Video Editing">
         <div class="proj-img">
-          <video src="portfolio%20hossam/reel%20video%20editing/hossam%20reel.mp4" muted loop playsinline autoplay></video>
+          <video src="portfolio%20hossam/reel%20video%20editing/hossam%20reel%20optimized.mp4" muted loop playsinline autoplay></video>
         </div>
         <div class="proj-overlay">
           <span class="proj-cat">Video Editing</span>
@@ -335,9 +373,9 @@
       </div>
 
       <!-- Vidéo 2 : Hossam Reel 2 -->
-      <div class="proj" data-type="video" data-src="portfolio%20hossam/reel%20video%20editing/hossam%20reel%202.mp4" data-title="Hossam Reel 2" data-cat="Video Editing">
+      <div class="proj" data-type="video" data-src="portfolio%20hossam/reel%20video%20editing/hossam%20reel%202%20optimized.mp4" data-title="Hossam Reel 2" data-cat="Video Editing">
         <div class="proj-img">
-          <video src="portfolio%20hossam/reel%20video%20editing/hossam%20reel%202.mp4" muted loop playsinline autoplay></video>
+          <video src="portfolio%20hossam/reel%20video%20editing/hossam%20reel%202%20optimized.mp4" muted loop playsinline autoplay></video>
         </div>
         <div class="proj-overlay">
           <span class="proj-cat">Video Editing</span>
@@ -369,7 +407,7 @@
 
   <footer>
     <a href="index.html" class="logo">
-      <img src="logo hossam white.png" alt="HB" style="height:30px;width:auto; object-fit: contain; filter:brightness(0) invert(1);">
+      <img src="logo hossam white.webp" alt="HB" style="height:30px;width:auto; object-fit: contain; filter:brightness(0) invert(1);">
       <span style="display: block; margin-top: 8px;">HOSSAM EL BENDADI</span>
     </a>
     <p>© 2026 Hossam El Bendadi</p>
@@ -499,6 +537,8 @@
   lb.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
   lb.addEventListener('touchend', e => { const d = tx - e.changedTouches[0].clientX; if(Math.abs(d)>50) d>0?next():prev(); });
 </script>
+
+<script src="responsive.js"></script>
 
 </body>
 </html>
