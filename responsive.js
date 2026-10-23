@@ -33,7 +33,7 @@
     });
   }
 
-  document.querySelectorAll('.proj, .port-item').forEach(card => {
+  document.querySelectorAll('.proj, .port-item:not(.coming-soon)').forEach(card => {
     card.setAttribute('role', 'button');
     card.tabIndex = 0;
     card.addEventListener('keydown', event => {

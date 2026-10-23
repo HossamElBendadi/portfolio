@@ -389,6 +389,32 @@ footer p {
   color: var(--muted); opacity: 0.3;
 }
 
+.port-item.coming-soon {
+  cursor: default;
+  border-color: var(--border);
+}
+.port-item.coming-soon:hover {
+  border-color: var(--border);
+}
+.coming-soon-content {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--bg2);
+  text-align: center;
+  padding: 20px;
+}
+.coming-soon-content .soon-cat {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 8px;
+}
+.coming-soon-content .soon-title {
+  font-family: var(--font-head); font-size: 22px; color: var(--text);
+  margin-bottom: 4px;
+}
+.coming-soon-content .soon-sub {
+  font-size: 12px; color: var(--muted);
+}
+
 .port-overlay {
   position: absolute;
   inset: 0;
