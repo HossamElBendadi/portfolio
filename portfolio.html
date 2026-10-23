@@ -422,6 +422,10 @@
   </div>
 
   <div class="lb-img-wrap">
+    <div id="lb-error" style="display:none; position:absolute; z-index:1000; flex-direction:column; gap:16px; align-items:center; color:var(--muted); font-size:14px; text-transform:uppercase; letter-spacing:2px;">
+      <span>Media failed to load</span>
+      <button id="lb-retry" class="btn-outline" style="padding:10px 24px; font-size:12px;">Retry</button>
+    </div>
     <img class="lb-img" id="lb-img" src="" alt="">
     <video class="lb-video" id="lb-video" controls playsinline preload="metadata"></video>
   </div>
@@ -481,6 +485,10 @@
   const lbPrev    = document.getElementById('lb-prev');
   const lbNext    = document.getElementById('lb-next');
   const lbVideo   = document.getElementById('lb-video');
+  const lbError   = document.getElementById('lb-error');
+  const lbRetry   = document.getElementById('lb-retry');
+  
+  lbRetry.addEventListener('click', () => { updateLightbox(); });
 
   let visibleItems  = [];
   let currentIndex  = 0;
@@ -522,10 +530,10 @@
   }
 
   function closeLightbox() {
-    cancelPreloads();
     if (activeImageLoader) {
       activeImageLoader.onload = null;
-      activeImageLoader.src = '';
+      activeImageLoader.onerror = null;
+      activeImageLoader.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
       activeImageLoader = null;
     }
     loadId++; // Cancel pending loads
@@ -537,26 +545,21 @@
     lbVideo.pause();
     lbVideo.removeAttribute('src');
     lbVideo.load();
+    lbError.style.display = 'none';
+    lbImg.removeAttribute('src');
+    lbImg.style.display = 'none';
   }
 
   let preloadCache = new Set();
   const CACHE_SIZE = 6;
-  let activePreloads = [];
-
-  function cancelPreloads() {
-    activePreloads.forEach(img => {
-      if (!img.complete) img.src = '';
-    });
-    activePreloads = [];
-  }
-
   function preloadImage(url) {
     if (!url || typeof url !== 'string' || url === '') return;
     if (preloadCache.has(url)) return;
-    const img = new Image();
-    img.src = url;
-    activePreloads.push(img);
     preloadCache.add(url);
+    const img = new Image();
+    img.onload = () => {};
+    img.onerror = () => { preloadCache.delete(url); };
+    img.src = url;
     if (preloadCache.size > CACHE_SIZE) {
       const first = preloadCache.values().next().value;
       preloadCache.delete(first);
@@ -567,10 +570,11 @@
   let activeImageLoader = null;
 
   function updateLightbox() {
-    cancelPreloads();
+    lbError.style.display = 'none';
     if (activeImageLoader) {
       activeImageLoader.onload = null;
-      activeImageLoader.src = '';
+      activeImageLoader.onerror = null;
+      activeImageLoader.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
       activeImageLoader = null;
     }
 
@@ -607,6 +611,13 @@
             preloadImage(nextSrc);
             preloadImage(prevSrc);
             activeImageLoader = null;
+          }
+        };
+        activeImageLoader.onerror = () => {
+          if (loadId === currentId) {
+            activeImageLoader = null;
+            lbImg.style.display = 'none';
+            lbError.style.display = 'flex';
           }
         };
         activeImageLoader.src = mediaSrc;
@@ -661,6 +672,13 @@
             if (nextItem && (!nextItem.dataset.type || nextItem.dataset.type === 'image')) preloadImage(nextItem.dataset.img);
             if (prevItem && (!prevItem.dataset.type || prevItem.dataset.type === 'image')) preloadImage(prevItem.dataset.img);
             activeImageLoader = null;
+          }
+        };
+        activeImageLoader.onerror = () => {
+          if (loadId === currentId) {
+            activeImageLoader = null;
+            lbImg.style.display = 'none';
+            lbError.style.display = 'flex';
           }
         };
         activeImageLoader.src = imgSrc;
